@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CSR Creation</title>
+    <style>
+        /* Add some basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSR Creation</h1>
+    <form id="csrForm">
+        <label for="commonNames">Domain Names (comma-separated):</label>
+        <input type="text" id="commonNames" name="commonNames">
+
+        <label for="organization">Organization:</label>
+        <input type="text" id="organization" name="organization">
+
+        <label for="country">Country:</label>
+        <input type="text" id="country" name="country">
+
+        <label for="state">State:</label>
+        <input type="text" id="state" name="state">
+
+        <label for="locality">Locality:</label>
+        <input type="text" id="locality" name="locality">
+
+        <label for="organizationalUnit">Organizational Unit:</label>
+        <input type="text" id="organizationalUnit" name="organizationalUnit">
+
+        <!-- Add other CSR details fields as needed -->
+
+        <button type="submit">Generate CSR</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        // Handle form submission
+        document.getElementById("csrForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            // Get form values
+            var commonNames = document.getElementById("commonNames").value;
+            var organization = document.getElementById("organization").value;
+            var country = document.getElementById("country").value;
+            var state = document.getElementById("state").value;
+            var locality = document.getElementById("locality").value;
+            var organizationalUnit = document.getElementById("organizationalUnit").value;
+
+            // Get other CSR details as needed
+
+            // Create payload object
+            var payload = {
+                common_names: commonNames.split(",").map(function (cn) {
+                return cn.trim(); // Trim whitespace around domain names
+            }),
+                country: country,
+                state: state,
+                locality: locality,
+                organization: organization,
+                organizational_unit: organizationalUnit
+                
+
+    // Add other CSR details to the payload object
+};
+
+
+            // Send request to the backend API
+            fetch("http://127.0.0.1:5000/create_csr", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                // Handle the response
+                var publicKey = data.public_key;
+                var csr = data.csr;
+
+                // Display the generated CSR and public key
+                document.getElementById("result").innerHTML = "<h2>Generated CSR:</h2>" +
+                    "<textarea readonly>" + csr + "</textarea>" +
+                    "<h2>Public Key:</h2>" +
+                    "<textarea readonly>" + publicKey + "</textarea>";
+            })
+            .catch(function(error) {
+                // Handle any errors
+                console.error("Error:", error);
+            });
+        });
+    </script>
+</body>
+</html>
